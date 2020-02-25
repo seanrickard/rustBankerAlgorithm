@@ -56,20 +56,20 @@ fn main() {
         safe_state: false,
     };
 
-    println!("{:?}", process_one);
-    println!("{:?}", process_two);
-    println!("{:?}", process_three);
-    println!("{:?}", process_four);
-    println!("{:?}", process_five);
-
     let mut procs: Vec<Process> = Vec::with_capacity(5);
-    procs.push(process_one);
+    let mut ran_procs: Vec<Process> = Vec::with_capacity(5);
+
+    procs.push(process_one.clone());
     procs.push(process_two);
     procs.push(process_three);
     procs.push(process_four);
     procs.push(process_five);
-    let procs = calc_need(procs.clone());
-    println!("{:?}", procs);
+    let mut procs = calc_need(procs.clone());
+    print_process_list(procs.clone());
+    let process_one = procs.remove(0);
+    let process_one =
+        can_process_run_safely(process_one.clone(), available.clone(), procs.clone().len());
+    println!("process one: {:?}", process_one.clone());
 }
 
 #[derive(Debug, Clone)]
@@ -79,12 +79,6 @@ pub struct Process {
     required_resources: Vec<i16>,
     need: Vec<i16>,
     safe_state: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct FinishedProc {
-    available: Vec<i16>,
-    process: Process,
 }
 
 pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
@@ -97,4 +91,29 @@ pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
         }
     }
     procs
+}
+
+pub fn print_process_list(processes: Vec<Process>) {
+    let procs = processes.clone();
+    for x in procs.iter() {
+        println!("{:?}", x);
+    }
+}
+
+pub fn can_process_run_safely(process: Process, available: Vec<i16>, length: usize) -> Process {
+    let mut counter = 0;
+    let mut proc_clone = process.clone();
+    let mut aval_clone = available.clone();
+    for (j, k) in proc_clone.need.iter_mut().zip(aval_clone.iter_mut()) {
+        if j <= k {
+            counter += 1;
+            if counter == length {
+                proc_clone.safe_state = true;
+            }
+        } else if j > k {
+            break;
+        }
+    }
+
+    proc_clone
 }
