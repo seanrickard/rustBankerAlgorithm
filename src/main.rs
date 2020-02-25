@@ -1,4 +1,5 @@
 use std::fs::File;
+use std::fmt;
 use std::io::{BufRead, BufReader};
 fn main() {
     let file = BufReader::new(File::open("input1.txt").unwrap());
@@ -17,7 +18,7 @@ fn main() {
     println!("Available resources: {:?}", available);
 
     let mut process_one = Process {
-        name: String::from("process1"),
+        name: String::from("\nprocess1"),
         need: Vec::new(),
         allocated: file.remove(0),
         required_resources: file.remove(4),
@@ -25,7 +26,7 @@ fn main() {
     };
 
     let mut process_two = Process {
-        name: String::from("process2"),
+        name: String::from("\nprocess2"),
         need: Vec::new(),
         allocated: file.remove(0),
         required_resources: file.remove(3),
@@ -33,7 +34,7 @@ fn main() {
     };
 
     let mut process_three = Process {
-        name: String::from("process3"),
+        name: String::from("\nprocess3"),
         need: Vec::new(),
         allocated: file.remove(0),
         required_resources: file.remove(2),
@@ -41,7 +42,7 @@ fn main() {
     };
 
     let mut process_four = Process {
-        name: String::from("process4"),
+        name: String::from("\nprocess4"),
         need: Vec::new(),
         allocated: file.remove(0),
         required_resources: file.remove(1),
@@ -49,18 +50,18 @@ fn main() {
     };
 
     let mut process_five = Process {
-        name: String::from("process5"),
+        name: String::from("\nprocess5"),
         need: Vec::new(),
         allocated: file.remove(0),
         required_resources: file.remove(0),
-        safe_state: false,
+        safe_state: false,        
     };
 
-    println!("{:?}", process_one);
-    println!("{:?}", process_two);
-    println!("{:?}", process_three);
-    println!("{:?}", process_four);
-    println!("{:?}", process_five);
+    // println!("{:?}", process_one);
+    // println!("{:?}", process_two);
+    // println!("{:?}", process_three);
+    // println!("{:?}", process_four);
+    // println!("{:?}", process_five);
 
     let mut procs: Vec<Process> = Vec::with_capacity(5);
     procs.push(process_one);
@@ -97,4 +98,19 @@ pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
         }
     }
     procs
+}
+
+//Used to display 
+impl fmt::Display for Process {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(
+            f,
+            "name: {}, allocated: {:#?}, required_resources: {:#?}, need: {:#?}, safe_state: {}'b\n'",
+            self.name,
+            self.allocated,
+            self.required_resources,
+            self.need,
+            self.safe_state,
+        )
+    }
 }
