@@ -90,55 +90,7 @@ fn main() {
     procs.push(process_five);
     let procs = calc_need(procs.clone());
     println!("{:?}", procs);
-
-
-fn update_aval(aval: Vec<i16>, allocation: Vec<i16>, mut process: Process) -> Process {
-    let mut new_aval: Vec<i16> = Vec::new();
-    let mut temp = 0;
-    for (x, y) in aval.iter().zip(allocation.iter()) {
-        new_aval.insert(temp, x + y);
-        temp += 1;
-        //process.available_resources(new_aval.clone());
-    }
-    process
-}
-
-fn can_process_run_safely(need: Vec<i16>, aval: Vec<i16>, mut process: Process) -> Process {
-    let mut counter = 0;
-    //  println!("COUNTER IS: {:?} ", counter);
-    for (x, y) in need.iter().zip(aval.iter()) {
-        println!("{:?} {:?}", x, y);
-        if x <= y {
-            counter += 1;
-            if counter == aval.len() - 1 {
-                process.safe_state = true;
-            }
-        } else if x > y {
-            break;
-        }
-    }
-
-    process
-}
-
-
-//Used to display 
-impl fmt::Display for Process {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(
-            f,
-            "name: {}, allocated: {:#?}, required_resources: {:#?}, need: {:#?}, safe_state: {}\n",
-            self.name,
-            self.allocated,
-            self.required_resources,
-            self.need,
-            self.safe_state,
-        )
-    }
-}
-
-
-
+    
 }
 
 #[derive(Debug, Clone)]
