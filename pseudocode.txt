@@ -1,0 +1,28 @@
+calc need of all processes in list
+
+can determine_safe_order (processes: vec<process>, aval: <i16>) -> finishedProcesses
+{
+
+    while(finishedProcesses.len() < processes.len())
+    for process in processes 
+    if x <= y where x is the allocated processes resource, and y is the aval resource
+    process.safe_state = true
+    let aval = update_aval(process, aval) -> return aval,  
+    finishedProcesses.push(processes.remove[0]);
+    else break;
+
+}
+
+update_aval(process, aval)
+
+finished.push(processes.pop())
+
+let finished = add_to_finished (Process, )
+calc need 
+
+while finished < 5
+check safe state of each process in list, 
+return first process that is safe to run
+call update_aval
+add process to finished
+remove process from processes list

@@ -14,7 +14,7 @@ fn main() {
 
     let mut available = file.remove(0);
 
-    println!("Available resources: {:?}", available);
+    // println!("Available resources: {:?}", available);
 
     let mut process_one = Process {
         name: String::from("process1"),
@@ -57,19 +57,41 @@ fn main() {
     };
 
     let mut procs: Vec<Process> = Vec::with_capacity(5);
-    let mut ran_procs: Vec<Process> = Vec::with_capacity(5);
+    let mut finished: Vec<Process> = Vec::with_capacity(5);
+    let mut unable_to_run: Vec<Process> = Vec::new();
 
     procs.push(process_one.clone());
-    procs.push(process_two);
-    procs.push(process_three);
-    procs.push(process_four);
-    procs.push(process_five);
-    let mut procs = calc_need(procs.clone());
-    print_process_list(procs.clone());
-    let process_one = procs.remove(0);
-    let process_one =
-        can_process_run_safely(process_one.clone(), available.clone(), procs.clone().len());
-    println!("process one: {:?}", process_one.clone());
+    procs.push(process_two.clone());
+    procs.push(process_three.clone());
+    procs.push(process_four.clone());
+    procs.push(process_five.clone());
+    let mut counter = 0;
+
+    procs = calc_need(procs.clone());
+
+    while finished.len() < procs.clone().len() {
+
+        
+        //procs = get_unsafe_procs();
+        for x in procs.clone().iter_mut() {
+            println!("Checking process  {:?} {}", counter, "if safe to run.");
+            x.safe_state = check_safe_state(x.clone().need, available.clone());
+           
+            println!("{:?}", x.safe_state);
+            if x.safe_state == true {
+                available = update_aval(x.clone().allocated, available.clone());
+                
+                let ( procs, finished) =
+                    remove_safe_process_add_to_finished(procs.clone(), finished.clone());
+                println!("Finished: {:?}", finished);
+                println!("Processes: {:?}", procs);
+                break;
+            }
+            counter += 1;
+            //println!("{}", counter);
+            break;
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -85,9 +107,8 @@ pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
     let mut procs = processes.clone();
     for x in procs.iter_mut() {
         for (j, k) in x.allocated.iter().zip(x.required_resources.iter()) {
-            let temp = j - k;
-            let temp_2 = temp.abs();
-            x.need.push(temp_2);
+            let temp = k - j;
+            x.need.push(temp);
         }
     }
     procs
@@ -100,20 +121,78 @@ pub fn print_process_list(processes: Vec<Process>) {
     }
 }
 
-pub fn can_process_run_safely(process: Process, available: Vec<i16>, length: usize) -> Process {
+pub fn update_aval(mut allocated: Vec<i16>, mut available: Vec<i16>) -> Vec<i16> {
+    let mut new_aval: Vec<i16> = Vec::new();
+    for (x, y) in allocated.iter_mut().zip(available.iter_mut()) {
+        let temp = *x + *y;
+        new_aval.push(temp);
+    }
+
+    new_aval
+}
+
+pub fn remove_safe_process_add_to_finished(
+    mut processes: Vec<Process>,
+    mut finished: Vec<Process>,
+) -> (Vec<Process>, Vec<Process>) {
+    for (x, y) in processes.clone().iter_mut().enumerate() {
+        if y.safe_state == true {
+            finished.push(processes.remove(x));
+        }
+    }
+    (processes, finished)
+}
+
+pub fn check_safe_state(mut need: Vec<i16>, mut available: Vec<i16>) -> bool {
     let mut counter = 0;
-    let mut proc_clone = process.clone();
-    let mut aval_clone = available.clone();
-    for (j, k) in proc_clone.need.iter_mut().zip(aval_clone.iter_mut()) {
-        if j <= k {
-            counter += 1;
-            if counter == length {
-                proc_clone.safe_state = true;
+    let mut state: bool = false;
+
+    for (x, y) in need.clone().iter_mut().zip(available.iter_mut()) {
+        if x <= y {
+            //println!("here");
+            if counter == need.len() - 1 {
+                state = true;
             }
-        } else if j > k {
-            break;
+            counter += 1;
         }
     }
 
-    proc_clone
+    state
 }
+
+// pub fn update_aval(
+//     mut processes: Vec<Process>,
+//     mut resource: Vec<i16>,
+// ) -> (Vec<Process>, Vec<i16>) {
+//     let mut new_aval: Vec<i16> = Vec::new();
+//     let mut temp = 0;
+
+//     for x in processes.iter_mut() {
+//         for (i, j) in x.allocated.iter().zip(resource.clone().iter()) {
+//             if temp < resource.clone().len() {
+//                 new_aval.insert(temp, i + j);
+//                 println!("After insert{:?} {:?}", new_aval, x);
+//                 temp += 1;
+//             }
+//             println!("After if statement");
+//         }
+//         resource = new_aval.clone();
+//     }
+//     (processes, resource)
+// }
+
+// pub fn can_process_run_safely(process: Process, available: Vec<i16>) -> Process {
+//     let mut proc = process.clone();
+//     println!("i hate this {:?}", proc);
+//     for x in proc.need.iter {
+
+//         for (j, k) in process.need.iter().zip(available.iter()) {
+//         println!("jJJJJJJJJJJJJJJJ {:?}", j);
+
+//         let temp = j - k;
+//         let temp_2 = temp.abs();
+//        // x.need.push(temp_2);
+//     }
+// }
+//     proc
+// }
