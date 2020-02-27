@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 fn main() {
@@ -56,45 +57,53 @@ fn main() {
         safe_state: false,
     };
 
-    let mut procs: Vec<Process> = Vec::with_capacity(5);
-    let mut finished: Vec<Process> = Vec::with_capacity(5);
-    let mut unable_to_run: Vec<Process> = Vec::new();
+    let mut procs: VecDeque<Process> = VecDeque::with_capacity(5);
+    let mut finished: VecDeque<Process> = VecDeque::with_capacity(5);
+    let mut non_runnable: VecDeque<Process> = VecDeque::with_capacity(5);
 
-    procs.push(process_one.clone());
-    procs.push(process_two.clone());
-    procs.push(process_three.clone());
-    procs.push(process_four.clone());
-    procs.push(process_five.clone());
-    let mut counter = 0;
+    procs.push_front(process_one.clone());
+    procs.push_back(process_two.clone());
+    procs.push_back(process_three.clone());
+    procs.push_back(process_four.clone());
+    procs.push_back(process_five.clone());
 
-    procs = calc_need(procs.clone());
-
-    while finished.len() < procs.clone().len() {
-
-        
-        //procs = get_unsafe_procs();
+    procs = calc_need(procs);
+    let total_procs = procs.clone().len();
+    while &finished.len() < &(total_procs) {
         for x in procs.clone().iter_mut() {
-            println!("Checking process  {:?} {}", counter, "if safe to run.");
-            x.safe_state = check_safe_state(x.clone().need, available.clone());
-           
+            //println!("Checking process  {:?} {}", counter, "if safe to run.");
+            //println!("{:?}", x);
+            //println!("{:?}", available);
+            x.safe_state = check_safe_state(&x.need, &available);
+            let temp = x.clone();
+
             println!("{:?}", x.safe_state);
             if x.safe_state == true {
-                available = update_aval(x.clone().allocated, available.clone());
-                
-                let ( procs, finished) =
-                    remove_safe_process_add_to_finished(procs.clone(), finished.clone());
+                //println!("{:?}", x);
+                available = update_aval(&x.allocated, &available);
+                finished.push_back(temp);
+                procs.pop_front();
+                // println!("{:?}", available);
                 println!("Finished: {:?}", finished);
                 println!("Processes: {:?}", procs);
+                println!("Processes: {:?}", available);
+            }
+            if x.safe_state == false {
+                non_runnable.push_front(procs.pop_front().unwrap());
                 break;
             }
-            counter += 1;
+            if procs.len() == 0 && non_runnable.len() != 0 {
+                procs.push_front(non_runnable.pop_front().unwrap());
+                println!("{:?}", procs);
+                break;
+            }
+
             //println!("{}", counter);
-            break;
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Process {
     name: String,
     allocated: Vec<i16>,
@@ -103,7 +112,7 @@ pub struct Process {
     safe_state: bool,
 }
 
-pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
+pub fn calc_need(processes: VecDeque<Process>) -> VecDeque<Process> {
     let mut procs = processes.clone();
     for x in procs.iter_mut() {
         for (j, k) in x.allocated.iter().zip(x.required_resources.iter()) {
@@ -114,16 +123,16 @@ pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
     procs
 }
 
-pub fn print_process_list(processes: Vec<Process>) {
+pub fn print_process_list(processes: VecDeque<Process>) {
     let procs = processes.clone();
     for x in procs.iter() {
         println!("{:?}", x);
     }
 }
 
-pub fn update_aval(mut allocated: Vec<i16>, mut available: Vec<i16>) -> Vec<i16> {
+pub fn update_aval(allocated: &Vec<i16>, available: &Vec<i16>) -> Vec<i16> {
     let mut new_aval: Vec<i16> = Vec::new();
-    for (x, y) in allocated.iter_mut().zip(available.iter_mut()) {
+    for (x, y) in allocated.iter().zip(available.iter()) {
         let temp = *x + *y;
         new_aval.push(temp);
     }
@@ -131,23 +140,11 @@ pub fn update_aval(mut allocated: Vec<i16>, mut available: Vec<i16>) -> Vec<i16>
     new_aval
 }
 
-pub fn remove_safe_process_add_to_finished(
-    mut processes: Vec<Process>,
-    mut finished: Vec<Process>,
-) -> (Vec<Process>, Vec<Process>) {
-    for (x, y) in processes.clone().iter_mut().enumerate() {
-        if y.safe_state == true {
-            finished.push(processes.remove(x));
-        }
-    }
-    (processes, finished)
-}
-
-pub fn check_safe_state(mut need: Vec<i16>, mut available: Vec<i16>) -> bool {
+pub fn check_safe_state(need: &Vec<i16>, available: &Vec<i16>) -> bool {
     let mut counter = 0;
     let mut state: bool = false;
 
-    for (x, y) in need.clone().iter_mut().zip(available.iter_mut()) {
+    for (x, y) in need.iter().zip(available.iter()) {
         if x <= y {
             //println!("here");
             if counter == need.len() - 1 {
@@ -159,40 +156,3 @@ pub fn check_safe_state(mut need: Vec<i16>, mut available: Vec<i16>) -> bool {
 
     state
 }
-
-// pub fn update_aval(
-//     mut processes: Vec<Process>,
-//     mut resource: Vec<i16>,
-// ) -> (Vec<Process>, Vec<i16>) {
-//     let mut new_aval: Vec<i16> = Vec::new();
-//     let mut temp = 0;
-
-//     for x in processes.iter_mut() {
-//         for (i, j) in x.allocated.iter().zip(resource.clone().iter()) {
-//             if temp < resource.clone().len() {
-//                 new_aval.insert(temp, i + j);
-//                 println!("After insert{:?} {:?}", new_aval, x);
-//                 temp += 1;
-//             }
-//             println!("After if statement");
-//         }
-//         resource = new_aval.clone();
-//     }
-//     (processes, resource)
-// }
-
-// pub fn can_process_run_safely(process: Process, available: Vec<i16>) -> Process {
-//     let mut proc = process.clone();
-//     println!("i hate this {:?}", proc);
-//     for x in proc.need.iter {
-
-//         for (j, k) in process.need.iter().zip(available.iter()) {
-//         println!("jJJJJJJJJJJJJJJJ {:?}", j);
-
-//         let temp = j - k;
-//         let temp_2 = temp.abs();
-//        // x.need.push(temp_2);
-//     }
-// }
-//     proc
-// }
