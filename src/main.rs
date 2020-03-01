@@ -3,22 +3,40 @@ use std::fmt;
 use std::io::{BufRead, BufReader};
 use std::io;
 use std::io::Write; //to enable flush
-fn main() {
 
-    // enum FileEnum {
-    //     f1 (u8),
-    //     f2 (u8), 
-    //     f3 (u8),
-    // }
+fn f1() {
+    println!("In f1");
+}
+ 
+fn f2() {
+    println!("In f2");
+}
+ 
+fn f_unknown() {
+    println!("In unknown function");
+}
 
-    // print!("Choose the file to process: "); 
-    // io::stdout().flush().unwrap();
-    // let mut choice = String::new();
+fn main() {    
 
-    // io::stdin().read_line(&mut choice)
-    //     .expect("Failed to read choice");
+    print!("Choose the file to process: "); 
+    io::stdout().flush().unwrap();
+    let mut choice = String::new();
 
-    // println!("You chose: {}", choice);
+    io::stdin().read_line(&mut choice)
+        .expect("Failed to read choice");
+
+    println!("You chose: {}", choice);
+
+    //**********************************************/        
+        //let user_choice = 2;
+     
+        //Execute function based on user_choice's value
+        match choice {
+            // "1" => f1(),
+            // "2" => f2(),
+            _ => f_unknown(),
+        }
+    //**********************************************/
 
         //text file 1
         let file = BufReader::new(File::open("input1.txt").unwrap());
