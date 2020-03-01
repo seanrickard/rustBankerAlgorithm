@@ -5,6 +5,7 @@ use std::io;
 use std::io::Write; //to enable flush
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 fn f1() {
     println!("In f1");
 }
@@ -19,6 +20,12 @@ fn f_unknown() {
 
 fn main() {    
 
+=======
+fn main() {    
+
+//loop {
+
+>>>>>>> Stashed changes
     print!("Choose the file to process: "); 
     io::stdout().flush().unwrap();
     let mut choice = String::new();
@@ -26,6 +33,7 @@ fn main() {
     io::stdin().read_line(&mut choice)
         .expect("Failed to read choice");
 
+<<<<<<< Updated upstream
     println!("You chose: {}", choice);
 
     //**********************************************/        
@@ -38,6 +46,32 @@ fn main() {
             _ => f_unknown(),
         }
     //**********************************************/
+=======
+    let choice: u32 = choice.trim().parse()
+        .expect("Please type a number!");
+
+        // let trimmed = choice.trim();
+        // match trimmed.parse::<u32>() {
+        //     Ok(i) => println!("Your integer input: {}", i),
+        //     Err(..) => println!("{} is not an integer.", trimmed),
+        // };
+
+    println!("You chose: {}", choice);
+    //break;
+
+    FileChoice(&choice); //function call that will choose which file to run
+
+//     }
+
+//     // // // let choice = 0u8;
+//     // match choice n {
+//     //     Number { value: 1, .. } => println!("One"),
+//     //     // 2 => println!("two"),
+//     //     // 3 => println!("three"),        
+//     //     _ => (),
+//     // }  
+// }           
+>>>>>>> Stashed changes
 
         //text file 1
         let file = BufReader::new(File::open("input1.txt").unwrap());
@@ -54,6 +88,7 @@ fn main() {
         let mut available = file.remove(0);
 
         println!("Available resources: {:?}", available);
+<<<<<<< Updated upstream
 =======
 fn main() {
 
@@ -106,6 +141,8 @@ fn main() {
     let mut available = file.remove(0);
 
     // println!("Available resources: {:?}", available);
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     let mut process_one = Process {
@@ -163,6 +200,7 @@ fn main() {
     let procs = calc_need(procs.clone());
     println!("{:?}", procs);
     
+<<<<<<< Updated upstream
 }
 
 <<<<<<< Updated upstream
@@ -181,6 +219,11 @@ fn FileChoice(choice: &u32) {
 
 
 #[derive(Debug, Clone, PartialEq)]
+>>>>>>> Stashed changes
+=======
+}
+
+#[derive(Debug, Clone)]
 >>>>>>> Stashed changes
 pub struct Process {
     name: String,
@@ -208,6 +251,7 @@ pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
     procs
 }
 
+<<<<<<< Updated upstream
 
 
 
@@ -216,4 +260,16 @@ pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
 =======
     state
 }
+>>>>>>> Stashed changes
+=======
+fn FileChoice(choice: &u32) {
+    match choice {
+        1 => println!("ONE"),
+        2 => println!("TWO"),
+        _ => println!("Invalid"),
+    }
+}
+
+
+
 >>>>>>> Stashed changes
