@@ -14,79 +14,43 @@ fn main() {
         .collect();
 
     let mut available = file.remove(0);
+    let mut num = file.len() / 2;
+    let mut counter = 0;
 
-    // println!("Available resources: {:?}", available);
-
-    let mut process_one = Process {
-        name: String::from("process1"),
-        need: Vec::new(),
-        allocated: file.remove(0),
-        required_resources: file.remove(4),
-        safe_state: false,
-    };
-
-    let mut process_two = Process {
-        name: String::from("process2"),
-        need: Vec::new(),
-        allocated: file.remove(0),
-        required_resources: file.remove(3),
-        safe_state: false,
-    };
-
-    let mut process_three = Process {
-        name: String::from("process3"),
-        need: Vec::new(),
-        allocated: file.remove(0),
-        required_resources: file.remove(2),
-        safe_state: false,
-    };
-
-    let mut process_four = Process {
-        name: String::from("process4"),
-        need: Vec::new(),
-        allocated: file.remove(0),
-        required_resources: file.remove(1),
-        safe_state: false,
-    };
-
-    let mut process_five = Process {
-        name: String::from("process5"),
-        need: Vec::new(),
-        allocated: file.remove(0),
-        required_resources: file.remove(0),
-        safe_state: false,
-    };
-
+    let mut allocated: VecDeque<Vec<i16>> = VecDeque::new();
+    let mut required: VecDeque<Vec<i16>> = VecDeque::new();
     let mut procs: VecDeque<Process> = VecDeque::with_capacity(5);
+
+    while file.len() != 0 {
+        if counter <= file.len() || num == 1 {
+            allocated.push_back(file.remove(0));
+            required.push_back(file.remove(num - 1));
+            procs.push_back(Process {
+                id: counter,
+                need: Vec::new(),
+                allocated: allocated.pop_front().unwrap(),
+                required_resources: required.pop_front().unwrap(),
+                safe_state: false,
+            });
+            num = num - 1;
+            counter += 1;
+        }
+    }
+
     let mut finished: VecDeque<Process> = VecDeque::with_capacity(5);
     let mut non_runnable: VecDeque<Process> = VecDeque::with_capacity(5);
-
-    procs.push_front(process_one.clone());
-    procs.push_back(process_two.clone());
-    procs.push_back(process_three.clone());
-    procs.push_back(process_four.clone());
-    procs.push_back(process_five.clone());
 
     procs = calc_need(procs);
     let total_procs = procs.clone().len();
     while &finished.len() < &(total_procs) {
         for x in procs.clone().iter_mut() {
-            //println!("Checking process  {:?} {}", counter, "if safe to run.");
-            //println!("{:?}", x);
-            //println!("{:?}", available);
             x.safe_state = check_safe_state(&x.need, &available);
             let temp = x.clone();
 
-            println!("{:?}", x.safe_state);
             if x.safe_state == true {
-                //println!("{:?}", x);
                 available = update_aval(&x.allocated, &available);
                 finished.push_back(temp);
                 procs.pop_front();
-                // println!("{:?}", available);
-                println!("Finished: {:?}", finished);
-                println!("Processes: {:?}", procs);
-                println!("Processes: {:?}", available);
             }
             if x.safe_state == false {
                 non_runnable.push_front(procs.pop_front().unwrap());
@@ -94,18 +58,22 @@ fn main() {
             }
             if procs.len() == 0 && non_runnable.len() != 0 {
                 procs.push_front(non_runnable.pop_front().unwrap());
-                println!("{:?}", procs);
+                // println!("{:?}", procs);
                 break;
             }
-
-            //println!("{}", counter);
         }
+        println!("Available resources: {:?}", available);
+
     }
+    println!("Safe order: " );
+
+    print_process_list(finished);
+
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Process {
-    name: String,
+    id: usize,
     allocated: Vec<i16>,
     required_resources: Vec<i16>,
     need: Vec<i16>,
