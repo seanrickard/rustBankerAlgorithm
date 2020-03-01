@@ -4,6 +4,7 @@ use std::io::{BufRead, BufReader};
 use std::io;
 use std::io::Write; //to enable flush
 
+<<<<<<< Updated upstream
 fn f1() {
     println!("In f1");
 }
@@ -53,6 +54,59 @@ fn main() {
         let mut available = file.remove(0);
 
         println!("Available resources: {:?}", available);
+=======
+fn main() {
+
+    //loop {
+
+        print!("Choose the file to process: "); 
+        io::stdout().flush().unwrap();
+        let mut choice = String::new();
+
+        io::stdin().read_line(&mut choice)
+            .expect("Failed to read choice");
+
+        let choice: u32 = choice.trim().parse()
+            .expect("Please type a number!");
+
+            // let trimmed = choice.trim();
+            // match trimmed.parse::<u32>() {
+            //     Ok(i) => println!("Your integer input: {}", i),
+            //     Err(..) => println!("{} is not an integer.", trimmed),
+            // };
+
+        println!("You chose: {}", choice);
+        //break;
+
+        FileChoice(&choice); //function call that will choose which file to run
+
+    //     }
+
+    //     // // // let choice = 0u8;
+    //     // match choice n {
+    //     //     Number { value: 1, .. } => println!("One"),
+    //     //     // 2 => println!("two"),
+    //     //     // 3 => println!("three"),        
+    //     //     _ => (),
+    //     // }  
+    // }           
+    
+    let file = BufReader::new(File::open("input1.txt").unwrap());
+    
+    let mut file: Vec<Vec<i16>> = file
+        .lines()
+        .map(|l| {
+            l.unwrap()
+                .split(char::is_whitespace)
+                .map(|number| number.parse().unwrap())
+                .collect()
+        })
+        .collect();
+
+    let mut available = file.remove(0);
+
+    // println!("Available resources: {:?}", available);
+>>>>>>> Stashed changes
 
     let mut process_one = Process {
         name: String::from("process1"),
@@ -111,7 +165,23 @@ fn main() {
     
 }
 
+<<<<<<< Updated upstream
 #[derive(Debug, Clone)]
+=======
+
+
+fn FileChoice(choice: &u32) {
+    match choice {
+        1 => println!("ONE"),
+        2 => println!("TWO"),
+        _ => println!("Invalid"),
+    }
+}
+
+
+
+#[derive(Debug, Clone, PartialEq)]
+>>>>>>> Stashed changes
 pub struct Process {
     name: String,
     allocated: Vec<i16>,
@@ -142,3 +212,8 @@ pub fn calc_need(processes: Vec<Process>) -> Vec<Process> {
 
 
 
+<<<<<<< Updated upstream
+=======
+    state
+}
+>>>>>>> Stashed changes
